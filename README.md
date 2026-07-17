@@ -1,6 +1,6 @@
 # 32-bit Single-Cycle MIPS Processor using Verilog HDL
 
-A 32-bit Single-Cycle MIPS Processor designed and implemented in **Verilog HDL** using **Xilinx Vivado**. The processor executes each instruction in a single clock cycle by integrating the datapath and control unit into a complete processor architecture.
+This Project demonstates a 32-bit Single-Cycle MIPS Processor designed and implemented in **Verilog HDL** using **Xilinx Vivado**. The processor executes each instruction in a single clock cycle by integrating the datapath and control unit into a complete processor architecture.
 
 This project demonstrates the implementation of the fundamental components of a MIPS processor, including the Program Counter, Instruction Memory, Register File, Arithmetic Logic Unit (ALU), Data Memory, Control Unit, ALU Control Unit, multiplexers, adders, and branch logic. Functional verification was carried out through behavioral simulation using a custom testbench.
 
@@ -8,8 +8,7 @@ This project demonstrates the implementation of the fundamental components of a 
 
 ## Features
 
-- Designed a 32-bit Single-Cycle MIPS Processor in Verilog HDL
-- Modular RTL implementation with independently developed components
+- Designed individual hardware modules and integrated them into a complete processor
 - Integrated datapath and control path architecture
 - Supports arithmetic, logical, memory access, immediate, and branch instructions
 - Functional verification using behavioral simulation
@@ -51,34 +50,34 @@ Each module was designed independently and then integrated to implement the comp
 
 ---
 
-## Project Structure
+##  Project Structure
 
 ```text
 single-cycle-mips-processor/
 │
 ├── src/
-│   ├── pc.v
-│   ├── instruction_memory.v
-│   ├── control_unit.v
-│   ├── register_file.v
-│   ├── sign_extend.v
-│   ├── alu_control.v
-│   ├── alu.v
-│   ├── data_memory.v
-│   ├── mux.v
-│   ├── adder.v
-│   └── mips_top.v
+│   ├── pc.v                  // Implements the Program Counter (PC)
+│   ├── instruction_memory.v  // Stores the machine code instructions
+│   ├── control_unit.v        // Generates the control signals for the processor
+│   ├── register_file.v       // Implements the 32-bit register file
+│   ├── sign_extend.v         // Extends 16-bit immediate values to 32 bits
+│   ├── alu_control.v         // Generates the ALU control signals
+│   ├── alu.v                 // Performs arithmetic and logical operations
+│   ├── data_memory.v         // Implements the data memory module
+│   ├── mux.v                 // Implements the multiplexers used in the datapath
+│   ├── adder.v               // Implements the 32-bit adders used in the datapath
+│   └── mips_top.v            // Top-level module integrating all processor components
 │
 ├── sim/
-│   ├── tb_mips.v
-│   └── instructions.mem
+│   ├── tb_mips.v             // Testbench for processor verification
+│   └── instructions.mem      // Machine code program for simulation
 │
 ├── images/
-│   ├── datapath.png
-│   ├── rtl.png
-│   └── waveform.png
+│   ├── datapath.png          // Processor datapath diagram
+│   ├── rtl.png               // RTL schematic generated in Vivado
+│   └── waveform.png          // Simulation waveform
 │
-└── README.md
+└── README.md                 // Project documentation
 ```
 
 ---
@@ -90,9 +89,9 @@ Each instruction is executed in a single clock cycle through the following stage
 1. Fetch the instruction from Instruction Memory.
 2. Decode the instruction and generate the required control signals.
 3. Read source operands from the Register File.
-4. Perform arithmetic or logical operations using the ALU.
+4. Perform arithmetic or logical operations using the ALU if required by the instruction.
 5. Access Data Memory for load and store instructions.
-6. Write the result back to the Register File.
+6. Write the result back to the Register File if required by the instruction.
 7. Update the Program Counter to the next sequential or branch address.
 
 ---
@@ -133,14 +132,6 @@ beq  $s2, $t3, LABEL
 
 ---
 
-## Tools Used
-
-- Verilog HDL
-- Xilinx Vivado
-- Behavioral Simulation
-
----
-
 ## Simulation Results
 
 The processor was successfully verified through behavioral simulation.
@@ -162,15 +153,18 @@ Simulation validates:
 
 Possible extensions to this processor include:
 
+- Support for additional MIPS instructions like Jump (`j`) and Jump-and-Link (`jal`) instructions
 - 5-stage pipelined MIPS architecture
-- Hazard Detection Unit
-- Data Forwarding Unit
-- Support for additional MIPS instructions
-- Jump (`j`) and Jump-and-Link (`jal`) instructions
 - FPGA implementation and hardware validation
 
 ---
 
+## Tools Used
+
+
+- Xilinx Vivado
+
+---
 ## Author
 
 **Bhavya Jain**
