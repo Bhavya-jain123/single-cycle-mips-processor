@@ -44,7 +44,7 @@ always @(*) begin
 
         // Unsupported ALUOp
         default:
-            alu_control = 4'b0000;
+            alu_control = 4'b1111;
 
     endcase
 
