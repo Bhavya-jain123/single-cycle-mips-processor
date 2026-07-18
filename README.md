@@ -94,6 +94,17 @@ Each instruction is executed in a single clock cycle through the following stage
 6. Write the result back to the Register File if required by the instruction.
 7. Update the Program Counter to the next sequential or branch address.
 
+## Processor Datapath
+
+The figure below illustrates the architecture of the implemented 32-bit Single-Cycle MIPS Processor.
+
+<p align="center">
+  <a href="images/singlecycledatapath.png">
+    <img src="images/singlecycledatapath.png" alt="Processor Datapath" width="650">
+  </a>
+</p>
+
+*Figure adapted from the ES336 – Computer Architecture lecture slides, IIT Gandhinagar.*
 ---
 
 ## Verification
