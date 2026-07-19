@@ -2,7 +2,7 @@
 
 This project demonstrates the design and implementation of a **32-bit Single-Cycle MIPS Processor** using **Verilog HDL** and verified through **Xilinx Vivado** simulation. The processor executes each instruction in a single clock cycle by integrating the datapath and control unit into a complete processor architecture.
 
-The processor implements the fundamental components of a MIPS architecture, including the Program Counter, Instruction Memory, Register File, Arithmetic Logic Unit (ALU), Data Memory, Main Control Unit, ALU Control Unit, multiplexers, adders, and Next PC logic. Additional features such as overflow detection, invalid instruction detection, and support for jump instructions have also been implemented.
+The processor implements the fundamental components of a MIPS architecture, including the Program Counter, Instruction Memory, Register File, Arithmetic Logic Unit (ALU), Data Memory, Main Control Unit, ALU Control Unit, multiplexers, adders, and Next PC logic. Additional features such as overflow detection and invalid instruction detection have also been implemented.
 
 ---
 ## Highlights
@@ -39,9 +39,6 @@ The processor consists of the following major modules:
 - Data Memory
 - Multiplexers
 - Adders
-- Next PC Selection Logic
-- Overflow Detection Logic
-- Invalid Instruction Detection Logic
 - Top-Level Processor Integration Module
 
 Each module was designed independently and then integrated to implement the complete single-cycle processor.
@@ -72,7 +69,6 @@ single-cycle-mips-processor/
 │
 ├── images/
 │   ├── datapath.png          // Processor datapath diagram
-│   ├── rtl.png               // RTL schematic generated in Vivado
 │   └── waveform.png          // Simulation waveform
 │
 └── README.md                 // Project documentation
@@ -199,9 +195,3 @@ Possible extensions to this processor include:
 3. ES336 – Computer Architecture and Organization, Lecture Slides, Indian Institute of Technology Gandhinagar.
 
 ---
-## Author
-
-**Bhavya Jain**
-
-B.Tech, Integrated Circuit Design and Technology (ICDT)  
-Indian Institute of Technology Gandhinagar
