@@ -87,7 +87,7 @@ The figure below illustrates the architecture of the implemented 32-bit Single-C
 </p>
 
 <p align="center">
-  <sup><i>Figure adapted from the ES336 Computer Architecture lecture slides, IIT Gandhinagar.</i></sup>
+  <sup><i>Figure taken from (https://media.cheggcdn.com/study/be5/be58e30b-61f2-4a3e-9224-3a4460d5a471/singlecycledatapath.png).</i></sup>
 </p>
 
 ---
@@ -167,7 +167,7 @@ Behavioral simulation was performed using Xilinx Vivado to verify the functional
 | Memory Access | `lw`, `sw` | [View Waveform](images/Waveform3.png) |
 | Branch Instructions | `beq`, `bne` | [View Waveform](images/Waveform4.png) |
 | Jump Instructions | `j`, `jal`, `jr` | [View Waveform](images/Waveforms5.png) |
-| Exception Handling | Overflow and Invalid Instruction Detection | [View Waveform](images/Waveform6.png) |
+| Exception Handling | Invalid Instruction Detection | [View Waveform](images/Waveform6.png) |
 
 ---
 
