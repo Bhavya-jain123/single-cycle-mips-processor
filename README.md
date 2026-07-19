@@ -1,31 +1,27 @@
 # 32-bit Single-Cycle MIPS Processor using Verilog HDL
 
-This Project demonstates a 32-bit Single-Cycle MIPS Processor designed and implemented in **Verilog HDL** using **Xilinx Vivado**. The processor executes each instruction in a single clock cycle by integrating the datapath and control unit into a complete processor architecture.
+This project demonstrates the design and implementation of a **32-bit Single-Cycle MIPS Processor** using **Verilog HDL** and verified through **Xilinx Vivado** simulation. The processor executes each instruction in a single clock cycle by integrating the datapath and control unit into a complete processor architecture.
 
-This project demonstrates the implementation of the fundamental components of a MIPS processor, including the Program Counter, Instruction Memory, Register File, Arithmetic Logic Unit (ALU), Data Memory, Control Unit, ALU Control Unit, multiplexers, adders, and branch logic. Functional verification was carried out through behavioral simulation using a custom testbench.
+The processor implements the fundamental components of a MIPS architecture, including the Program Counter, Instruction Memory, Register File, Arithmetic Logic Unit (ALU), Data Memory, Main Control Unit, ALU Control Unit, multiplexers, adders, and Next PC logic. Additional features such as overflow detection, invalid instruction detection, and support for jump instructions have also been implemented.
 
 ---
+## Highlights
 
-## Features
-
-- Designed individual hardware modules and integrated them into a complete processor
-- Integrated datapath and control path architecture
-- Supports arithmetic, logical, memory access, immediate, and branch instructions
-- Functional verification using behavioral simulation
-- Well-documented and reusable Verilog modules
-- Machine-code based instruction execution using instruction memory
+- Designed and implemented a **32-bit Single-Cycle MIPS Processor** in Verilog HDL.
+- Supports **18 MIPS instructions** across **R-type, I-type, and J-type** formats.
+- Includes **signed overflow detection** and **invalid instruction handling**.
+- Verified functionality using a custom Verilog testbench and behavioral simulation in **Xilinx Vivado**.
+- Modular architecture with reusable datapath and control components.
 
 ---
 
 ## Supported Instructions
 
-| Instruction Type | Instructions |
-|------------------|--------------|
-| Arithmetic | `add`, `sub`, `addi` |
-| Logical | `and`, `or` |
-| Comparison | `slt` |
-| Memory Access | `lw`, `sw` |
-| Branch | `beq` |
+| Instruction Format | Supported Instructions |
+|--------------------|------------------------|
+| **R-Type** | `add`, `sub`, `and`, `or`, `xor`, `nor`, `slt`, `jr` |
+| **I-Type** | `addi`, `andi`, `ori`, `slti`, `lw`, `sw`, `beq`, `bne` |
+| **J-Type** | `j`, `jal` |
 
 ---
 
@@ -37,20 +33,22 @@ The processor consists of the following major modules:
 - Instruction Memory
 - Main Control Unit
 - Register File
-- Sign Extension Unit
+- Immediate Extension Unit
 - ALU Control Unit
 - Arithmetic Logic Unit (ALU)
 - Data Memory
 - Multiplexers
 - Adders
-- Branch Address Generation Logic
+- Next PC Selection Logic
+- Overflow Detection Logic
+- Invalid Instruction Detection Logic
 - Top-Level Processor Integration Module
 
 Each module was designed independently and then integrated to implement the complete single-cycle processor.
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```text
 single-cycle-mips-processor/
@@ -58,19 +56,19 @@ single-cycle-mips-processor/
 ├── src/
 │   ├── pc.v                  // Implements the Program Counter (PC)
 │   ├── instruction_memory.v  // Stores the machine code instructions
-│   ├── control_unit.v        // Generates the control signals for the processor
+│   ├── control_unit.v        // Generates the processor control signals
 │   ├── register_file.v       // Implements the 32-bit register file
-│   ├── sign_extend.v         // Extends 16-bit immediate values to 32 bits
-│   ├── alu_control.v         // Generates the ALU control signals
+│   ├── sign_extend.v         // Performs sign and zero extension of immediates
+│   ├── alu_control.v         // Generates ALU control signals
 │   ├── alu.v                 // Performs arithmetic and logical operations
 │   ├── data_memory.v         // Implements the data memory module
-│   ├── mux.v                 // Implements the multiplexers used in the datapath
-│   ├── adder.v               // Implements the 32-bit adders used in the datapath
-│   └── mips_top.v            // Top-level module integrating all processor components
+│   ├── mux4.v                // 4-to-1 multiplexers used in the datapath
+│   ├── adder.v               // 32-bit adders used in the datapath
+│   └── mips_top.v            // Top-level processor integrating all modules
 │
 ├── sim/
 │   ├── tb_mips.v             // Testbench for processor verification
-│   └── instructions.mem      // Machine code program for simulation
+│   └── instructions.mem      // Machine-code program for simulation
 │
 ├── images/
 │   ├── datapath.png          // Processor datapath diagram
@@ -82,18 +80,6 @@ single-cycle-mips-processor/
 
 ---
 
-## Datapath Execution Flow
-
-Each instruction is executed in a single clock cycle through the following stages:
-
-1. Fetch the instruction from Instruction Memory.
-2. Decode the instruction and generate the required control signals.
-3. Read source operands from the Register File.
-4. Perform arithmetic or logical operations using the ALU if required by the instruction.
-5. Access Data Memory for load and store instructions.
-6. Write the result back to the Register File if required by the instruction.
-7. Update the Program Counter to the next sequential or branch address.
-
 ## Processor Datapath
 
 The figure below illustrates the architecture of the implemented 32-bit Single-Cycle MIPS Processor.
@@ -104,25 +90,41 @@ The figure below illustrates the architecture of the implemented 32-bit Single-C
   </a>
 </p>
 
-*Figure adapted from the ES336 – Computer Architecture lecture slides, IIT Gandhinagar.*
+<p align="center">
+  <sup><i>Figure adapted from the ES336 Computer Architecture lecture slides, IIT Gandhinagar.</i></sup>
+</p>
+
+---
+
+## Datapath Execution Flow
+
+Each instruction is executed in a single clock cycle through the following stages:
+
+1. Fetch the instruction from Instruction Memory.
+2. Decode the instruction and generate the required control signals.
+3. Read operands from the Register File.
+4. Perform arithmetic, logical, or comparison operations using the ALU.
+5. Access Data Memory for load and store instructions.
+6. Write the result back to the Register File when required.
+7. Update the Program Counter based on sequential execution, branch, jump, or jump register logic at the next posedge of clock.
+
 ---
 
 ## Verification
 
-A custom Verilog testbench was developed to verify the processor functionality.
+The processor was verified using a custom Verilog testbench with machine-code programs stored in `instructions.mem`.
 
-The test program stored in `instructions.mem` validates:
+Verification includes:
 
-- Arithmetic operations (`add`, `sub`, `addi`)
-- Logical operations (`and`, `or`)
-- Comparison operation (`slt`)
-- Load (`lw`) and Store (`sw`) instructions
-- Branch Equal (`beq`)
-- Register write-back
-- Data memory read/write operations
+- Arithmetic and logical operations
+- Comparison instructions
+- Memory access (`lw`, `sw`)
+- Branch and jump instructions (`beq`, `bne`, `j`, `jal`, `jr`)
+- Register file and data memory operations
 - Program Counter update logic
+- Signed overflow and invalid instruction detection
 
-Simulation waveforms confirmed the correct execution of all supported instructions.
+Behavioral simulation confirmed the correct execution of all supported instructions.
 
 ---
 
@@ -135,10 +137,25 @@ Example program:
 ```assembly
 addi $t0, $zero, 10
 addi $t1, $zero, 20
-add  $t3, $t0, $t1
-sw   $t3, 0($zero)
-lw   $s2, 0($zero)
-beq  $s2, $t3, LABEL
+
+add  $t2, $t0, $t1
+xor  $t3, $t0, $t1
+slti $s0, $t0, 15
+
+sw   $t2, 0($zero)
+lw   $s1, 0($zero)
+
+bne  $s1, $t0, TARGET
+jal  FUNCTION
+......
+......
+TARGET:
+j EXIT
+......
+FUNCTION:
+jr $ra
+......
+EXIT:
 ```
 
 ---
@@ -149,14 +166,26 @@ The processor was successfully verified through behavioral simulation.
 
 Simulation validates:
 
-- Correct ALU operations
-- Proper control signal generation
+- Correct arithmetic operations
+- Correct logical operations
+- Comparison instructions
+- Load and store operations
+- Branch execution (`beq`, `bne`)
+- Jump execution (`j`, `jal`, `jr`)
 - Register file read/write operations
 - Data memory access
-- Branch execution
 - Correct Program Counter updates
+- Signed overflow detection
+- Invalid instruction detection
 
-> **Note:** Simulation waveforms and RTL schematic are provided in the `images` directory.
+> **Note:** Simulation waveforms and RTL schematics are provided in the `images` directory.
+
+---
+
+## Tools Used
+
+- Verilog HDL
+- Xilinx Vivado
 
 ---
 
@@ -164,16 +193,17 @@ Simulation validates:
 
 Possible extensions to this processor include:
 
-- Support for additional MIPS instructions like Jump (`j`) and Jump-and-Link (`jal`) instructions
-- 5-stage pipelined MIPS architecture
+- Five-stage pipelined MIPS architecture
+- Implementation of much more instructions 
 - FPGA implementation and hardware validation
 
----
+## References
 
-## Tools Used
+1. John L. Hennessy and David A. Patterson, *Computer Architecture: A Quantitative Approach*, Morgan Kaufmann Publishers.
 
+2. David A. Patterson and John L. Hennessy, *Computer Organization and Design: The Hardware/Software Interface*, Morgan Kaufmann Publishers.
 
-- Xilinx Vivado
+3. ES336 – Computer Architecture and Organization, Lecture Slides, Indian Institute of Technology Gandhinagar.
 
 ---
 ## Author
