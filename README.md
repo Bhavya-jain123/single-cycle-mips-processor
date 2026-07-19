@@ -162,23 +162,16 @@ EXIT:
 
 ## Simulation Results
 
-The processor was successfully verified through behavioral simulation.
+Behavioral simulation was performed using Xilinx Vivado to verify the functionality of the 32-bit single-cycle MIPS processor.
 
-Simulation validates:
-
-- Correct arithmetic operations
-- Correct logical operations
-- Comparison instructions
-- Load and store operations
-- Branch execution (`beq`, `bne`)
-- Jump execution (`j`, `jal`, `jr`)
-- Register file read/write operations
-- Data memory access
-- Correct Program Counter updates
-- Signed overflow detection
-- Invalid instruction detection
-
-> **Note:** Simulation waveforms and RTL schematics are provided in the `images` directory.
+| Instruction Category | Instructions Verified | Waveform |
+|----------------------|----------------------|----------|
+| Arithmetic Operations | `addi`, `add`, `sub` | [View Waveform](images/Waveform1.png) |
+| Logical & Comparison Operations | `and`, `or`, `xor`, `nor`, `slt`, `andi`, `ori`, `slti` | [View Waveform](images/Waveform2.png) |
+| Memory Access | `lw`, `sw` | [View Waveform](images/Waveform3.png) |
+| Branch Instructions | `beq`, `bne` | [View Waveform](images/Waveform4.png) |
+| Jump Instructions | `j`, `jal`, `jr` | [View Waveform](images/Waveforms5.png) |
+| Exception Handling | Overflow and Invalid Instruction Detection | [View Waveform](images/Waveform6.png) |
 
 ---
 
