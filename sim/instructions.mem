@@ -6,29 +6,52 @@
 
 2008000A    // addi $t0, $zero, 10
 20090014    // addi $t1, $zero, 20
-200AFFFB    // addi $t2, $zero, -5
+200A0005    // addi $t2, $zero, 5
 01095820    // add  $t3, $t0, $t1
-01286022    // sub  $t4, $t1, $t0
+012A6022    // sub  $t4, $t1, $t2
 01096824    // and  $t5, $t0, $t1
-01097025    // or   $t6, $t0, $t1
-0109782A    // slt  $t7, $t0, $t1
-0128802A    // slt  $s0, $t1, $t0
-01008822    // sub  $s1, $t0, $zero
+010A7025    // or   $t6, $t0, $t2
+01097826    // xor  $t7, $t0, $t1
+01098027    // nor  $s0, $t0, $t1
+0149882A    // slt  $s1, $t2, $t1
+3132000F    // andi $s2, $t1, 15
+351300FF    // ori  $s3, $t0, 255
+29540008    // slti $s4, $t2, 8
 AC0B0000    // sw   $t3, 0($zero)
-AC0C0004    // sw   $t4, 4($zero)
-8C120000    // lw   $s2, 0($zero)
-8C130004    // lw   $s3, 4($zero)
-125B0001    // beq  $s2, $t3, +1
-2014006F    // addi $s4, $zero, 111
-124C0001    // beq  $s2, $t4, +1
-201500DE    // addi $s5, $zero, 222
-0253B020    // add  $s6, $s2, $s3
-0253B822    // sub  $s7, $s2, $s3
-20180064    // addi $t8, $zero, 100
-20190032    // addi $t9, $zero, 50
-AC180008    // sw   $t8, 8($zero)
-8C100008    // lw   $s0, 8($zero)
-12180001    // beq  $s0, $t8, +1
+8C150000    // lw   $s5, 0($zero)
+20160064    // addi $s6, $zero, 100
+02C8B820    // add  $s7, $s6, $t0
+02EAC022    // sub  $t8, $s7, $t2
+02E9C824    // and  $t9, $s7, $t1
+030AD025    // or   $k0, $t8, $t2
+11090002    // beq  $t0, $t1, +2
+2004006F    // addi $a0, $zero, 111
+200500DE    // addi $a1, $zero, 222
+01293022    // sub  $a2, $t1, $t1
+10C00002    // beq  $a2, $zero, +2
+20070032    // addi $a3, $zero, 50
+2002003C    // addi $v0, $zero, 60
+15090002    // bne  $t0, $t1, +2
+2003004D    // addi $v1, $zero, 77
+201C0058    // addi $gp, $zero, 88
+15080002    // bne  $t0, $t0, +2
+20100037    // addi $s0, $zero, 55
+08000023    // j    0x0000008C
+2011006F    // addi $s1, $zero, 111
+201200DE    // addi $s2, $zero, 222
+0C000028    // jal  0x000000A0
+341300FF    // ori  $s3, $zero, 255
+3274000F    // andi $s4, $s3, 15
+0800002B    // j    0x000000AC
+00000000    // nop
+0109A826    // xor  $s5, $t0, $t1
+010AB020    // add  $s6, $t0, $t2
+03E00008    // jr   $ra
+20087FFF    // addi $t0, $zero, 32767
+20090001    // addi $t1, $zero, 1
+0109B820    // add  $s7, $t0, $t1
+0109D827    // nor  $k1, $t0, $t1
+FC000000    // Invalid / Unsupported instruction
 00000000    // Extra nops added so that the processor does not fetch uninitialized instructions after program completion.
 00000000    
 00000000
