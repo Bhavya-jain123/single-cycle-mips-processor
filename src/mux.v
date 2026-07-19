@@ -1,17 +1,33 @@
 
-// Module: 2-to-1 Multiplexer (MUX)
+// Module: 4-to-1 Multiplexer (MUX4)
 // Description:
-// Selects one of two 32-bit input signals based on the select signal. 
-// This module is used throughout the MIPS datapath for operations such as selecting the ALU operand, destination register, write-back
-// data, and next Program Counter source.
+// Selects one of four 32-bit inputs based on the 2-bit select signal.
+// Used in the datapath to route the required data to the next stage.
 
-module mux(
+module mux4(
+
     input [31:0] a,
     input [31:0] b,
-    input sel,
-    output [31:0] y
+    input [31:0] c,
+    input [31:0] d,
+
+    input [1:0] sel,
+
+    output reg [31:0] y
+
 );
 
-assign y = (sel) ? b : a;
+always @(*) begin
+
+    case(sel)
+
+        2'b00: y = a;   // Select input a
+        2'b01: y = b;   // Select input b
+        2'b10: y = c;   // Select input c
+        2'b11: y = d;   // Select input d
+
+    endcase
+
+end
 
 endmodule
