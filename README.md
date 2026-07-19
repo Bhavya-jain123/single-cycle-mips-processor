@@ -167,7 +167,7 @@ Behavioral simulation was performed using Xilinx Vivado to verify the functional
 | Memory Access | `lw`, `sw` | [View Waveform](images/Waveform3.png) |
 | Branch Instructions | `beq`, `bne` | [View Waveform](images/Waveform4.png) |
 | Jump Instructions | `j`, `jal`, `jr` | [View Waveform](images/Waveforms5.png) |
-| Exception Handling | Invalid Instruction Detection | [View Waveform](images/Waveform6.png) |
+| Exception Handling | Overflow and Invalid Instruction Detection | [View Waveform](images/Waveform6.png) |
 
 ---
 
