@@ -1,8 +1,8 @@
 
-// Module: Top-Level MIPS Processor
+// Module: Single-Cycle MIPS Processor (Top Module)
 // Description:
-// Integrates all datapath and control modules to
-// implement a 32-bit single-cycle MIPS processor.
+// Integrates all datapath components of the 32-bit single-cycle MIPS processor, including the Program Counter, Instruction Memory, Control Unit, Register
+// File, ALU, Data Memory, and Next PC logic. Coordinates instruction fetch, decode, execute, memory access, and write-back for each clock cycle.
 
 module mips_top(
 
@@ -12,7 +12,7 @@ module mips_top(
 );
 
 //==================================================
-//                WIRES
+//             Internal Signals
 //==================================================
 
 // PC
@@ -27,7 +27,8 @@ wire [31:0] instruction;
 wire [31:0] read_data1;
 wire [31:0] read_data2;
 
-// Control Signals
+//================ Control Signals =================
+
 wire RegDst;
 wire ALUSrc;
 wire MemtoReg;
@@ -35,10 +36,50 @@ wire RegWrite;
 wire MemRead;
 wire MemWrite;
 wire Branch;
-wire [1:0] ALUOp;
+
+wire BranchNE;
+wire Jump;
+wire JumpLink;
+wire JumpReg;
+
+wire [2:0] ALUOp;
+
+//================ Additional Signals ==============
+
+// Destination Register
+wire [4:0] write_register;
+
+// Immediate
+wire [31:0] extended_immediate;
+wire [31:0] immediate;
+
+// ALU
+wire [31:0] alu_input2;
+wire [31:0] alu_result;
+wire zero;
+wire overflow;
+wire [3:0] alu_control_signal;
+
+// Data Memory
+wire [31:0] memory_data;
+
+// Write Back
+wire [31:0] write_back_data;
+
+// Branch
+wire [31:0] shifted_immediate;
+wire [31:0] branch_address;
+
+// Jump
+wire [31:0] jump_address;
+
+// Invalid Instruction
+wire InvalidOpcode;
+wire InvalidInstruction;
+wire invalid_instruction;
 
 //==================================================
-//                PROGRAM COUNTER
+//             Program Counter (PC)
 //==================================================
 
 pc PC(
@@ -51,19 +92,22 @@ pc PC(
 );
 
 //==================================================
-//             INSTRUCTION MEMORY
+//            Instruction Memory
 //==================================================
 
 instruction_memory IM(
+
     .address(pc),
     .instruction(instruction)
+
 );
 
 //==================================================
-//               CONTROL UNIT
+//              Main Control Unit
 //==================================================
 
 control_unit CU(
+
     .opcode(instruction[31:26]),
 
     .RegDst(RegDst),
@@ -72,52 +116,33 @@ control_unit CU(
     .RegWrite(RegWrite),
     .MemRead(MemRead),
     .MemWrite(MemWrite),
+
     .Branch(Branch),
-    .ALUOp(ALUOp)
+    .BranchNE(BranchNE),
+
+    .Jump(Jump),
+    .JumpLink(JumpLink),
+
+    .ALUOp(ALUOp),
+    .InvalidOpcode(InvalidOpcode)
 
 );
 
 //==================================================
-// Additional Wires
-//==================================================
-
-// Destination register
-wire [4:0] write_register;
-
-// Sign Extension
-wire [31:0] extended_immediate;
-
-// ALU
-wire [31:0] alu_input2;
-wire [31:0] alu_result;
-wire zero;
-wire [3:0] alu_control_signal;
-
-// Data Memory
-wire [31:0] memory_data;
-
-// Write Back
-wire [31:0] write_back_data;
-
-//Used in pc realted function 
-wire [31:0] branch_address;
-wire [31:0] shifted_immediate;
-  
-//==================================================
-// Register File
+//               Register File
 //==================================================
 
 register_file RF(
 
     .clk(clk),
     .reset_n(reset_n),
+
     .reg_write(RegWrite),
 
     .read_reg1(instruction[25:21]),
     .read_reg2(instruction[20:16]),
 
     .write_reg(write_register),
-
     .write_data(write_back_data),
 
     .read_data1(read_data1),
@@ -126,7 +151,7 @@ register_file RF(
 );
 
 //==================================================
-// Sign Extend
+//           Immediate Extension
 //==================================================
 
 sign_extend SE(
@@ -136,35 +161,54 @@ sign_extend SE(
 
 );
 
+// Zero-extend immediates for ANDI and ORI.
+// Sign-extend all other immediate instructions.
+
+assign immediate =
+    ((instruction[31:26] == 6'b001100) ||
+     (instruction[31:26] == 6'b001101))
+    ? {16'd0, instruction[15:0]}
+    : extended_immediate;
+
 //==================================================
-// ALU Control
+//              ALU Control Unit
 //==================================================
 
 alu_control ALUCTRL(
 
     .ALUOp(ALUOp),
     .funct(instruction[5:0]),
-    .alu_control(alu_control_signal)
+
+    .alu_control(alu_control_signal),
+    .JumpReg(JumpReg),
+    .InvalidInstruction(InvalidInstruction)
 
 );
 
 //==================================================
-// ALU Source MUX
+//          ALU Operand Selection MUX
 //==================================================
+//
+// sel:
+// 00 -> Register operand
+// 01 -> Immediate operand
+//
 
-mux ALU_MUX(
+mux4 ALU_SRC_MUX(
 
     .a(read_data2),
-    .b(extended_immediate),
+    .b(immediate),
+    .c(32'd0),
+    .d(32'd0),
 
-    .sel(ALUSrc),
+    .sel({1'b0, ALUSrc}),
 
     .y(alu_input2)
 
 );
 
 //==================================================
-// ALU
+//          Arithmetic Logic Unit
 //==================================================
 
 alu ALU(
@@ -175,13 +219,13 @@ alu ALU(
     .alu_control(alu_control_signal),
 
     .result(alu_result),
-
-    .zero(zero)
+    .zero(zero),
+    .overflow(overflow)
 
 );
 
 //==================================================
-// Data Memory
+//               Data Memory
 //==================================================
 
 data_memory DM(
@@ -201,20 +245,7 @@ data_memory DM(
 );
 
 //==================================================
-// Destination Register MUX
-//==================================================
-
-assign write_register = (RegDst) ? instruction[15:11] : instruction[20:16];
-
-//==================================================
-// Write Back MUX
-//==================================================
-
-assign write_back_data =
-        (MemtoReg) ? memory_data : alu_result;
-        
-//==================================================
-// PC + 4
+//              PC + 4 Adder
 //==================================================
 
 adder PC_ADDER(
@@ -225,19 +256,125 @@ adder PC_ADDER(
     .sum(pc_plus4)
 
 );
-//used for beq functions where we need to jump to certain place 
-assign shifted_immediate = extended_immediate << 2;
 
-//Normal pc+4 
+//==================================================
+//           Branch Address Calculation
+//==================================================
+
+// Shift the branch offset left by two bits to obtain
+// the byte-aligned branch address.
+
+assign shifted_immediate = immediate << 2;
+
 adder BRANCH_ADDER(
 
     .a(pc_plus4),
     .b(shifted_immediate),
+
     .sum(branch_address)
 
 );
-//For choosing next pc:
+//==================================================
+//            Jump Address Calculation
+//==================================================
+
+// Construct the jump target address using the upper
+// four bits of PC+4 and the 26-bit instruction field.
+
+assign jump_address =
+{
+    pc_plus4[31:28],
+    instruction[25:0],
+    2'b00
+};
+
+//==================================================
+//      Destination Register Selection MUX
+//==================================================
+//
+// sel:
+// 00 -> rt
+// 01 -> rd
+// 10 -> $31 (JAL)
+// 11 -> Unused
+//
+
+wire [31:0] write_register_ext;
+
+mux4 DEST_MUX(
+
+    .a({27'd0, instruction[20:16]}),
+    .b({27'd0, instruction[15:11]}),
+    .c(32'd31),
+    .d(32'd0),
+
+    .sel({JumpLink, RegDst}),
+
+    .y(write_register_ext)
+
+);
+
+assign write_register = write_register_ext[4:0];
+
+//==================================================
+//            Write-Back Data MUX
+//==================================================
+//
+// sel:
+// 00 -> ALU Result
+// 01 -> Memory Data
+// 10 -> PC + 4 (JAL)
+// 11 -> Unused
+//
+
+mux4 WB_MUX(
+
+    .a(alu_result),
+    .b(memory_data),
+    .c(pc_plus4),
+    .d(32'd0),
+
+    .sel({JumpLink, MemtoReg}),
+
+    .y(write_back_data)
+
+);
+
+//==================================================
+//        Invalid Instruction Detection
+//==================================================
+
+// Combine invalid opcode and invalid function detection.
+
+assign invalid_instruction =
+    InvalidOpcode || InvalidInstruction;
+
+//==================================================
+//             Next PC Selection Logic
+//==================================================
+
+// Priority:
+// 1. Invalid instruction
+// 2. Arithmetic overflow
+// 3. JR
+// 4. J / JAL
+// 5. BEQ / BNE
+// 6. Sequential execution (PC + 4)
+
 assign next_pc =
-        (Branch && zero) ? branch_address : pc_plus4;
+
+    invalid_instruction ? pc :
+
+    overflow ? pc :
+
+    JumpReg ? read_data1 :
+
+    Jump ? jump_address :
+
+    (Branch && zero) ? branch_address :
+
+    (BranchNE && !zero) ? branch_address :
+
+    pc_plus4;
 
 endmodule
